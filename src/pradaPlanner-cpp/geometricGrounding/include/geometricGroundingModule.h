@@ -27,18 +27,24 @@
 #include <algorithm>
 #include <string>
 
+#include "geometricGrounding_IDLserver.h"
+
 #include "Helpers.h"
 
 using namespace std;
 using namespace yarp::os;
 
-class geoGround : public RFModule
+class geoGround : public RFModule, public geometricGrounding_IDLserver
 {
     private:
         // module parameters
  
+        bool closing;
+
         string moduleName;
         string PathName;
+        string handlerPortName;
+
         vector<string> objects;
         vector<string> tools;
         vector<string> rules;
@@ -50,10 +56,11 @@ class geoGround : public RFModule
         string preruleFileName;
         string ruleFileName;
         string symbolFileName;
-        string objectsFileName;
 
-        BufferedPort<Bottle> plannerPort;
+        //BufferedPort<Bottle> plannerPort;
         BufferedPort<Bottle> affordancePort;
+
+        RpcServer handlerPort;
 		
 		RpcClient objectQueryPort;
 
@@ -63,7 +70,7 @@ class geoGround : public RFModule
         Bottle *plannerBottle;
         Bottle *AffBottle;
 
-        ifstream objectFile;
+//        ifstream objectFile;
         ifstream preruleFile;
         ifstream presymbolFile;
         ofstream ruleFile;
@@ -74,20 +81,27 @@ class geoGround : public RFModule
         virtual bool close();
         virtual bool updateModule();
         virtual bool interrupt();
+        virtual bool quit();
 
-        bool groundingCycle();
+        // IDL functions
+        bool attach(yarp::os::RpcServer &source);
+        string ground();
+
+        // module functions
+
         vector<string> create_rules(string pre_rule);
         vector<string> create_symbols(string symbols);
         void openFiles();
         void openPorts();
         bool loadObjs();
-        string plannerCommand();
+        /*string plannerCommand();
         bool plannerReply(string replyString);
         bool loadPreRules();
         bool createRulesList();
         bool getAffordances();
         bool createSymbolList();
         bool writeFiles();
+        bool groundingCycle();*/
 };
 
 #endif

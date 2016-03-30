@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 
     if(! yarp.checkNetwork() )
     {
-        yError("yarp server does not seem available");
+        yError("YARP server not available");
         return 1; // EXIT_FAILURE
     }
 

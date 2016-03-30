@@ -26,18 +26,23 @@
 #include <vector>
 #include <algorithm>
 
+#include "goalCompiler_IDLserver.h"
+
 #include "Helpers.h"
 
 using namespace std;
 using namespace yarp::os;
 
-class goalCompiler : public RFModule
+class goalCompiler : public RFModule, public goalCompiler_IDLserver
 {
     private:
         // module parameters
- 
+        
+        bool closing;
+
         string moduleName;
         string PathName;
+        string handlerPortName;
 
         vector<vector<string> > instructions;
         vector<vector<string> > translat;
@@ -50,22 +55,44 @@ class goalCompiler : public RFModule
         string preRuleFileName;
         string goalFileName;
 
-        BufferedPort<Bottle> plannerPort;
+        //BufferedPort<Bottle> plannerPort;
         BufferedPort<Bottle> praxiconPort;
+
+        RpcServer handlerPort;
 
 		RpcClient objectQueryPort;
 
 		Bottle cmd;
 		Bottle reply;
 
-        Bottle *plannerBottle;
+        //Bottle *plannerBottle;
         Bottle *praxiconBottle;
 
-        ifstream objectFile;
+//        ifstream objectFile;
         ifstream preRuleFile;
         ofstream goalFile;
         ofstream subgoalFile;
 
+// RPC module functions:
+
+    public:
+        virtual bool configure(ResourceFinder &rf);
+        virtual bool close();
+        virtual bool updateModule();
+        virtual bool interrupt();
+        virtual bool quit();
+        
+        //IDL functions
+        bool attach(yarp::os::RpcServer &source);
+        string waitPraxicon();
+        string compileGoals();
+
+        // module functions
+        void openFiles();
+        void openPorts();
+        bool loadObjs();
+        
+/*
     public:
         virtual bool configure(ResourceFinder &rf);
         virtual bool close();
@@ -86,7 +113,7 @@ class goalCompiler : public RFModule
         bool translate();
         bool writeFiles();
 		bool checkConsistency();
-        bool clearUnimportantGoals();
+        bool clearUnimportantGoals();*/
 };
 
 #endif
